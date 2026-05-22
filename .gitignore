@@ -1,0 +1,14 @@
+# Raw substrate data (large + often licensed)
+data/raw/**/*.zip
+data/raw/**/*.csv
+data/raw/**/*.dta
+data/raw/**/*.sav
+data/raw/**/*.sas7bdat
+data/raw/**/*.parquet
+data/raw/**/*.xpt
+data/raw/**/*.dat
+# Keep doc PDFs and READMEs
+!data/raw/**/*.pdf
+!data/raw/**/README.md
+# Processed
+data/processed/**
