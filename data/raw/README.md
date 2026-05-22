@@ -43,8 +43,17 @@ All raw data files (`.csv`, `.dta`, `.zip`, `.sas7bdat`, etc.) are gitignored. D
 
 ## Registration-required (manual steps — user action needed)
 
-### `anes_2024/` — REGISTRATION REQUIRED
-**Status:** Empty. Manual download required.
+### `anes_2024/` — ✓ DOWNLOADED 2026-05-22 (user via Chrome agent)
+**Status:** Files in place.
+**Verified shape:** 5,521 × 1,738 columns.
+**Variables confirmed (key V-codes):**
+- V241458x = continuous age (range 18-80, top-coded at 80, n=5,242)
+- V241455 = birth year, **RESTRICTED** in public file (all -3) — §12 deviation
+- V241404 = Israel/Palestinian humanitarian aid (confirmed real Israel/Gaza item)
+- V242577a-g = social media platform indicators (FB, X, Instagram, Reddit, YouTube, etc.)
+- V242350 = pay structure (verify hourly/salary semantics at impl time)
+- Many V-codes in V241xxx and V242xxx ranges cover the six-issue battery; exact V-code → item mapping is implementation-time work per operationalization supplement §7
+- **Caveat:** Earlier verification "CONFIRMED" status was over-confident on specific V-codes (e.g., V242176 turned out to be abortion-importance, not Israel). Verify each item's actual codebook label before locking it into a Stan dataset variable.
 **Steps:**
 1. Register a free account at https://electionstudies.org/ (click "Register" in top-right)
 2. Verify email
@@ -89,8 +98,18 @@ All raw data files (`.csv`, `.dta`, `.zip`, `.sas7bdat`, etc.) are gitignored. D
 - Apply to ANES + CES political-survey respondents (those have occupation + earnings + demographics but no hourly/salary)
 - 50-draw multiple-imputation propagation through Model B / C
 
-### `pew_vv_2024/` — REGISTRATION REQUIRED
-**Status:** Empty (microdata). PDFs available without registration but the SPSS / R microdata requires a Pew account.
+### `pew_vv_2024/` — ✓ DOWNLOADED 2026-05-22 (user via Chrome agent)
+**Status:** Files in place at `pew_vv_2024/W159_Nov24/`.
+**Verified shape:** 9,609 × 169 columns (CSV + SPSS .sav both included).
+**Variables confirmed:**
+- `VOTED2024`, `VOTECHOICE2024`, `VOTESTATUS2024` — vote validation against voter file
+- `VOTED2020/2018/2016` + `VOTECHOICE2020/2018/2016` — retrospective validation back to 2016
+- `WEIGHT_W159_VALIDATEDVOTE` — validated-vote weight, n=9,240 non-NaN
+- `F_AGECAT` — 4-band age categorical (NOT continuous birth year) — §12 deviation
+- `F_RACECMB`, `F_GENDER`, `F_EDUCCAT/2`, `F_CREGION`, `F_PARTY_FINAL`, `F_IDEO` — demographic + party
+- `DTCONF_ECON/IMMI/ABCN/CRIM/FRGN/CLSR_W159` — Trump-confidence on 6 issue areas (competence ratings, NOT position items; not in our issue battery)
+- `THERMTRUMP/HARRIS_W159` — feeling thermometers
+**Role:** Turnout-vs-choice separation + 2020 vote validation (confirmed; matches pre-reg §2 role lock).
 **Steps:**
 1. Register a free Pew account at https://www.pewresearch.org/dataset/ (click "Create an account")
 2. Verify email + sign user agreement
