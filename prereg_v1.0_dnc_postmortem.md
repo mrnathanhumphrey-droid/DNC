@@ -300,4 +300,5 @@ All §10.0 blocking items resolved. Pre-reg ready to lock.
 
 ---
 
-**Locked at commit (recorded after git init + commit):** _TBD_
+**Locked at commit:** `45ea69a` on `main`, pushed to `origin/main` 2026-05-22.
+Repository: https://github.com/mrnathanhumphrey-droid/DNC
