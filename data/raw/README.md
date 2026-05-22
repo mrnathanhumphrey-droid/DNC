@@ -70,8 +70,17 @@ All raw data files (`.csv`, `.dta`, `.zip`, `.sas7bdat`, etc.) are gitignored. D
 - 2020 vote recall + 2024 vote choice
 - Panel re-interview flag (n=2,070 from 2016-2020 ANES Panel)
 
-### `cps_org_2024/` — REGISTRATION REQUIRED (IPUMS-CPS)
-**Status:** Empty. Manual extract via IPUMS required.
+### `cps_org_2024/` — ✓ DOWNLOADED 2026-05-22 (IPUMS extract #2918366)
+**Status:** Files in place. Fixed-width `.dat` decompressed; Stata `.do` reader spec + codebook `.cbk` present.
+**Files:**
+- `cps_00001.dat.gz` (25 MB compressed) + `cps_00001.dat` (143 MB decompressed)
+- `cps_00001.do` (Stata reader: variable positions + scaling factors)
+- `cps_00001.cbk` (codebook with variable layout + value labels)
+**Verified shape:** 1,187,356 person-month records across Jan-Dec 2024 from CPS basic monthly samples.
+**ORG-eligible subset (PAIDHOUR > 0):** 125,880 records — 70,268 paid hourly + 55,612 salaried — this is the P(hourly) imputation training sample.
+**Variables (25 total):** YEAR, SERIAL, MONTH, HWTFINL, CPSID, ASECFLAG, REGION, STATEFIP, PERNUM, WTFINL, CPSIDP, CPSIDV, EARNWEEK2, HOURWAGE2, AGE, SEX, RACE, HISPAN, EMPSTAT, LABFORCE, OCC2010, IND, UHRSWORKT, EDUC, PAIDHOUR
+**Note:** The extract is full CPS basic-monthly (not pre-filtered to ORG). PAIDHOUR > 0 identifies ORG respondents — the rest are non-ORG and have PAIDHOUR=0. Filter in pipeline.
+**Scaling factors (from `.do`):** EARNWEEK2 / 100, HOURWAGE2 / 100, WTFINL / 10000.
 **Steps:**
 1. Register a free account at https://cps.ipums.org/cps/ (IPUMS-CPS)
 2. Build an extract via the IPUMS CPS extract builder:
@@ -138,7 +147,7 @@ All raw data files (`.csv`, `.dta`, `.zip`, `.sas7bdat`, etc.) are gitignored. D
 | Pew VV 2024 | **REGISTRATION REQUIRED** (PDFs public) | pewresearch.org/dataset | 8,942 (7,100 validated) | 0/6 (turnout substrate only) | Panel-profile continuous |
 | GSS 2024 | ✓ Downloaded | norc.org | 3,986 | natsci + nataid only (Tier 2 spending; natarts absent — §12 deviation) | Continuous `cohort` |
 | CPS ASEC 2025 | ✓ Downloaded | census.gov | 142,125 persons | n/a (labor-market backbone) | Continuous |
-| CPS ORG 2024 | **REGISTRATION REQUIRED** (IPUMS-CPS) | cps.ipums.org | ~12 monthly files, ~600k ORG-eligible persons across 2024 | n/a (PAIDHRE imputation training) | Continuous |
+| CPS ORG 2024 | ✓ Downloaded (IPUMS #2918366) | cps.ipums.org | 1,187,356 person-months Jan-Dec 2024; 125,880 ORG-eligible (PAIDHOUR>0) | n/a (PAIDHOUR imputation training) | Continuous AGE |
 
 ---
 
