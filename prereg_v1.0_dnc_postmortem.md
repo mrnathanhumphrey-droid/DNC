@@ -296,7 +296,8 @@ All §10.0 blocking items resolved. Pre-reg ready to lock.
 
 | Date | Deviation | Rationale |
 |---|---|---|
-| (none yet) | | |
+| 2026-05-22 | **GSS 2024: `natarts` is NOT in the 2024 wave.** §3 Issue 5 claimed "GSS 2024 \| NATSCI + NATARTS"; reality is NATSCI only. Issue 5 (science/arts funding) **collapses to "science spending only" on GSS**. ANES retains the science + arts compound (per operationalization supplement). | Schema-level discovery on data download 2026-05-22 (commit `304b645` + post-download verification). The 2024 GSS NAT* spending battery includes natsci, nataid, natchld, natcity, natcrime, natdrug, nateduc, natenrgy, natenvir, natfare, natheal, natrace, natroad, natsoc, natspac — but not natarts. Arts-related variables present (aimofart, proudart, notsmart) measure arts-engagement attitudes, not federal spending. Cross-substrate Issue 5 comparison uses science-only on GSS; ANES "science + arts" remains compound. Operationalization supplement updated accordingly. |
+| 2026-05-22 | **GSS 2024: no insurance-status variable.** §2 substrate row claimed "Insurance coverage rotating-uneven; verify in 2024 codebook." Verification at schema level 2026-05-22: no insurance / medicare / medicaid coverage variable in the 2024 wave's variable list. GSS **drops out of Model B insurance-pool analysis** (but retains spending-priorities role + cohort-effect role on Tier 2 items). | Schema-level discovery on data download. GSS's HEALTH module rotation did not include insurance coverage in the 2024 wave. Affects Model B only; Models A (demographic) and the issue-attitude analyses on spending priorities are unaffected. |
 
 ---
 

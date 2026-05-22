@@ -64,11 +64,11 @@ This document records per-substrate item operationalization, harmonization rules
 |---|---|---|---|
 | ANES 2024 | Federal spending battery (science + arts items) | Confirmed | Typically 3-pt: too little / about right / too much |
 | CES 2024 Common Content | NOT in Common Content (defense / welfare / environment / border are CES spending items, not science/arts) | DROPPED | — |
-| GSS 2024 | `NATSCI` + `NATARTS` | Confirmed (core spending module) | 3-pt: too little / about right / too much |
+| GSS 2024 | `natsci` only (NATARTS absent in 2024 — §12 deviation) | Verified at data download 2026-05-22: natsci present (n=3815 non-null); natarts NOT in 2024 wave variable list | 3-pt: too little / about right / too much (X-wording form) |
 | AP VoteCast 2024 | NOT PRESENT (no spending priorities battery) | DROPPED | — |
 | Pew VV 2024 | NOT PRESENT | — | — |
 
-**Harmonization:** GSS NATSCI/NATARTS coded as ordinal [-1, 0, +1] then z-standardized within substrate. ANES analog coded identically. Cross-substrate comparison on z-scores. Composite "science + arts" score = mean of NATSCI + NATARTS z-scores per respondent.
+**Harmonization (UPDATED 2026-05-22 per §12 deviation):** GSS Issue 5 = `natsci` z-score only (NATARTS unavailable in 2024 wave). ANES Issue 5 retains the science + arts compound as planned (mean z-score of ANES science + arts items). Cross-substrate Issue 5 comparison flagged: GSS science-only is a strict subset of the ANES compound; coefficients are NOT directly comparable. Report side-by-side with the asymmetry documented; pooled cross-substrate science-spending coefficient uses ANES-science-only x GSS-natsci as the comparable pair.
 
 ### Issue 6 — USAID / foreign aid (Tier 2)
 
@@ -76,7 +76,7 @@ This document records per-substrate item operationalization, harmonization rules
 |---|---|---|---|
 | ANES 2024 | Federal foreign aid spending item | Confirmed (USAID-adjacent, generic foreign aid spending) | 3-pt: too little / about right / too much |
 | CES 2024 Common Content | NOT PRESENT | DROPPED | — |
-| GSS 2024 | `NATAID` | Confirmed (core spending module) | 3-pt |
+| GSS 2024 | `nataid` (+ `nataidy` split-ballot Y-wording variant) | Verified at data download 2026-05-22: nataid n=1980 non-null + nataidy n=1897 (split-ballot half-samples; harmonize X/Y) | 3-pt |
 | AP VoteCast 2024 | NOT generic foreign-aid item; only `UKRAINEAID` + `ISRAELAID` exist (both country-specific) | DROPPED for Issue 6 (Israel-specific item already used in Issue 1; Ukraine-specific is out of scope) | — |
 | Pew VV 2024 | NOT PRESENT | — | — |
 
@@ -116,7 +116,7 @@ This document records per-substrate item operationalization, harmonization rules
 |---|---|---|
 | ANES 2024 | Confirmed present | Insured-private / insured-public / uninsured |
 | CES 2024 Common Content | Confirmed present | Same 3-level categorical |
-| GSS 2024 | Health insurance status (rotating; verify in 2024 codebook) | TBD |
+| GSS 2024 | NOT IN 2024 WAVE (§12 deviation 2026-05-22) | GSS drops out of Model B insurance-pool analysis; Models A + Tier 2 spending analyses unaffected |
 | AP VoteCast 2024 | NOT PRESENT (policy-attitude items only) | DROP from Model B on AP VoteCast |
 | Pew VV W159 | NOT PRESENT | DROP |
 
