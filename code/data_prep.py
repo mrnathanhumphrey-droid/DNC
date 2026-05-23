@@ -166,6 +166,12 @@ def anes_load_and_prep(outcome="vote"):
     if outcome == "vote":
         df = df[df["V242096x"].isin([1, 2])].copy()
         df["y"] = (df["V242096x"] == 1).astype(int)  # 1 = Harris
+    elif outcome == "vote_partyid":
+        # v2 probe: ANES vote with party-ID 7pt added as fundamental.
+        # Tests whether race-on-vote shrinks when conditioned on partisanship.
+        df = df[df["V242096x"].isin([1, 2]) & (df["V241227x"] > 0)].copy()
+        df["y"] = (df["V242096x"] == 1).astype(int)
+        df["fund_pid7_z"] = _zscore(df["V241227x"].astype(float))
     elif outcome == "gaza_aid_pal":
         # V241404: PRE FAVOR/OPPOSE U.S. GIVING HUMANITARIAN AID TO PALESTINIANS
         # 1=Favor, 2=Oppose, 3=Neither. z>0 = more opposed/neutral relative to favor.
@@ -337,6 +343,7 @@ if __name__ == "__main__":
     print("=== Data prep v2 ===\n")
     jobs = [
         ("ANES vote",            lambda: anes_load_and_prep("vote")),
+        ("ANES vote_partyid",    lambda: anes_load_and_prep("vote_partyid")),
         ("ANES gaza_aid_pal",    lambda: anes_load_and_prep("gaza_aid_pal")),
         ("ANES israel_military", lambda: anes_load_and_prep("israel_military")),
         ("ANES gaza_protests",   lambda: anes_load_and_prep("gaza_protests")),
