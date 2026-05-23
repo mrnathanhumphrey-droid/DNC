@@ -166,14 +166,30 @@ def anes_load_and_prep(outcome="vote"):
     if outcome == "vote":
         df = df[df["V242096x"].isin([1, 2])].copy()
         df["y"] = (df["V242096x"] == 1).astype(int)  # 1 = Harris
-    elif outcome == "israel":
-        df = df[df["V241404"] > 0].copy()
+    elif outcome == "gaza_aid_pal":
+        # V241404: PRE FAVOR/OPPOSE U.S. GIVING HUMANITARIAN AID TO PALESTINIANS
+        # 1=Favor, 2=Oppose, 3=Neither. z>0 = more opposed/neutral relative to favor.
+        df = df[df["V241404"].isin([1, 2, 3])].copy()
         df["y"] = _zscore(df["V241404"])
         outcome_kind = "gaussian"
+    elif outcome == "israel_military":
+        # V241401: PRE FAVOR/OPPOSE U.S. GIVING MILITARY ASSISTANCE TO ISRAEL
+        # 1=Favor, 2=Oppose, 3=Neither. z>0 = more opposed.
+        df = df[df["V241401"].isin([1, 2, 3])].copy()
+        df["y"] = _zscore(df["V241401"])
+        outcome_kind = "gaussian"
+    elif outcome == "gaza_protests":
+        # V241410: PRE APPROVE/DISAPPROVE PROTESTS AGAINST WAR IN GAZA
+        # 1=Approve, 2=Disapprove, 3=Neither. z>0 = more disapproving.
+        df = df[df["V241410"].isin([1, 2, 3])].copy()
+        df["y"] = _zscore(df["V241410"])
+        outcome_kind = "gaussian"
     elif outcome == "single_payer":
-        # V241247: scale on gov vs private insurance (placeholder; verify in v3)
-        df = df[df["V241247"] > 0].copy()
-        df["y"] = _zscore(df["V241247"])
+        # V241245: PRE 7PT SELF-PLACEMENT gov-vs-private medical insurance.
+        # 1=Government insurance plan, 7=Private insurance plan, 99=Haven't thought (DROP).
+        # z>0 = more pro-private.  CORRECTED FROM V241247 (Trump placement) §12 dev 8.
+        df = df[df["V241245"].isin(range(1, 8))].copy()  # keep 1..7, drop 99 + DK/RF/Inap
+        df["y"] = _zscore(df["V241245"])
         outcome_kind = "gaussian"
     elif outcome == "race_relations":
         # Need correct V-code; placeholder
@@ -320,12 +336,14 @@ def gss_load_and_prep(outcome="science"):
 if __name__ == "__main__":
     print("=== Data prep v2 ===\n")
     jobs = [
-        ("ANES vote",         lambda: anes_load_and_prep("vote")),
-        ("ANES israel",       lambda: anes_load_and_prep("israel")),
-        ("ANES single_payer", lambda: anes_load_and_prep("single_payer")),
-        ("CES vote",          lambda: ces_load_and_prep("vote")),
-        ("GSS science",       lambda: gss_load_and_prep("science")),
-        ("GSS foreign_aid",   lambda: gss_load_and_prep("foreign_aid")),
+        ("ANES vote",            lambda: anes_load_and_prep("vote")),
+        ("ANES gaza_aid_pal",    lambda: anes_load_and_prep("gaza_aid_pal")),
+        ("ANES israel_military", lambda: anes_load_and_prep("israel_military")),
+        ("ANES gaza_protests",   lambda: anes_load_and_prep("gaza_protests")),
+        ("ANES single_payer",    lambda: anes_load_and_prep("single_payer")),
+        ("CES vote",             lambda: ces_load_and_prep("vote")),
+        ("GSS science",          lambda: gss_load_and_prep("science")),
+        ("GSS foreign_aid",      lambda: gss_load_and_prep("foreign_aid")),
     ]
     for name, fn in jobs:
         print(f"--- {name} ---")
