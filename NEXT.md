@@ -1,7 +1,7 @@
 # Next Session — Pickup Pointer (DNC Post-Mortem)
 
-**Locked:** 2026-05-23 (commit `469dcd1` on `main`, github.com/mrnathanhumphrey-droid/DNC)
-**Last session ended:** result_v1.0_dnc_postmortem.md written + pushed. 8 Model A fits done, H1 NULL on magnitude, INVERTED on vote direction. Attitude-vs-vote gap surfaced as central finding.
+**Locked:** 2026-05-23 (commit `122fc8c` on `main`, github.com/mrnathanhumphrey-droid/DNC)
+**Last session ended:** result_v1.1 published. Cohort×race interaction (CES) + party-ID mediation probe (ANES) both complete. 4 credible CES interaction cells; party-ID mediates 61% of race-on-vote but NOT cohort.
 
 ---
 
@@ -19,6 +19,11 @@
 | §12 deviation 8 (single_payer V247→V245 + israel→gaza_aid_pal rename + israel_military + gaza_protests added) | FILED | 2289559 |
 | Batch B (3 fits: ANES single_payer V245 corrected + israel_military V241401 + gaza_protests V241410) | DONE | 469dcd1 |
 | `result_v1.0_dnc_postmortem.md` (200 lines, 9 sections) | WRITTEN + pushed | 469dcd1 |
+| `model_a_interaction.stan` + fit + analyze scripts | DONE | 60b4078 |
+| CES vote interaction fit (N=42028, 0 div, 4 credible cells) | DONE | 60b4078 |
+| ANES vote interaction fit (N=3539, 0 credible cells — substrate-N limit) | DONE | 60b4078 |
+| ANES vote_partyid fit (V241227x added as fund; race -61%, cohort +33%) | DONE | 122fc8c |
+| `result_v1.1_dnc_postmortem.md` (interaction + party-ID, 188 lines) | WRITTEN + pushed | 122fc8c |
 
 ## Headline findings (per result_v1.0 §1-5)
 
@@ -42,15 +47,31 @@
 
 **Secondary:** race-on-vote (σ=0.39-0.66) vs race-on-issues (σ=0.08-0.23) asymmetry. Race predicts vote much more than issue attitudes, conditional on 2020 recall.
 
-## v2 scope (per result_v1.0 §9)
+## v1.1 headline (post-interaction + party-ID)
+
+**4 credibly non-zero cohort×race cells on CES vote:**
+- Millennial × Hispanic -0.463 [-0.879, -0.103]  (Latino-Mill defection UPGRADED to credible)
+- Millennial × Asian    -0.379 [-0.822, -0.005]  (NEW: Asian-Mill defection)
+- GenZ × Asian          +0.437 [+0.058, +0.856]  (NEW: opposite direction same race)
+- Boomer × Black        +0.547 [+0.165, +0.964]  (anchor confirmed)
+
+**Asian-American voting in 2024 is generationally bifurcated** (only race with credibly-opposite cohort cells).
+
+**Walk-backs:** GenZ × Black = -0.269 [-0.661, +0.140] — CI includes zero; downgrade v1.0 "GenZ Black erosion" claim from finding to suggestive at this N.
+
+**Party-ID mediation:** race operates THROUGH pid7 (σ_race -61%); cohort operates AROUND pid7 (σ_cohort +33%). Two distinct mechanisms — Millennial defection survives partisanship control.
+
+## v2 scope (per result_v1.0 §9 + v1.1 §5)
 
 1. Fit remaining battery items: CES single_payer, CES structural_inequity, ANES race_relations, ANES science_arts compound, ANES foreign_aid. Item maps in operationalization supplement §1.
-2. AP VoteCast Model A (vote only, banded cohort approximation). Largest-N cohort test.
-3. **Cohort × race hierarchical interaction Stan model** to formalize the cross-tab in result.md §3 as posterior estimates with CIs.
-4. Party-ID-as-fundamental probe on ANES race-on-vote (race asymmetry follow-up).
+2. **AP VoteCast Model A + interaction** (N=139,938 voters, banded cohort approximation). Cross-substrate replication test of CES interaction cells — especially GenZ × Black (the v1.1 downgraded claim).
+3. ~~Cohort × race interaction Stan~~ DONE v1.1.
+4. ~~Party-ID-as-fundamental probe~~ DONE v1.1.
 5. Pew VV turnout-vs-choice separation.
 6. Model B/C revisit IF restricted-use ANES DUA becomes available.
 7. Within-cohort splits (older/younger Millennial 28-35 vs 36-43, older/younger Boomer) per pre-reg §4.
+8. **NEW v1.2 from v1.1 emergence:** within-Asian race detail — Asian-Mill defection + Asian-GenZ anchor split is the strongest single discovery. Worth disaggregating by ancestry / nativity / region if any substrate carries it.
+9. **NEW v1.2:** mechanism of cohort-bypass-of-pid7 — what predicts Millennial Biden defection conditional on party-ID? Issue salience? Trump-specific evaluation? Economic perception × cohort interaction?
 
 ## §12 deviation log (8 entries)
 
