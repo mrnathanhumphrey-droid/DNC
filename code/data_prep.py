@@ -189,6 +189,62 @@ def anes_load_and_prep(outcome="vote"):
         # Map cohort label to 1-5; compute product with econ_z
         cohort_num = df["cohort"].map({"Silent":1,"Boomer":2,"GenX":3,"Millennial":4,"GenZ":5})
         df["fund_econ_x_cohort"] = df["fund_econ_z"].astype(float) * cohort_num.fillna(3).astype(float)
+    elif outcome in ("vote_h8", "vote_h9", "vote_h10", "vote_h11", "vote_h12"):
+        # Pre-reg v2.1 H8-H12 (mediator hunt): same base as vote_h4 + 1 mediator
+        # for the specific hypothesis. K_fund_new = 9.
+        df = df[df["V242096x"].isin([1, 2]) & (df["V241227x"] > 0)].copy()
+        df["y"] = (df["V242096x"] == 1).astype(int)
+        df["fund_pid7_z"] = _zscore(df["V241227x"].astype(float))
+        df["fund_trump_ft_z"] = _zscore(df["V241157"].where(df["V241157"] >= 0))
+        df["fund_trump_ft_z"] = df["fund_trump_ft_z"].fillna(0.0)
+        df["fund_gaza_salience_z"] = _zscore(df["V241404"].where(df["V241404"] > 0))
+        df["fund_gaza_salience_z"] = df["fund_gaza_salience_z"].fillna(0.0)
+        cohort_num = df["cohort"].map({"Silent":1,"Boomer":2,"GenX":3,"Millennial":4,"GenZ":5})
+        df["fund_econ_x_cohort"] = df["fund_econ_z"].astype(float) * cohort_num.fillna(3).astype(float)
+
+        if outcome == "vote_h8":
+            # H8: ideology 7pt self-placement (V241177). Keep 1-7; drop 99/-9/-4.
+            df["fund_ideo7_z"] = _zscore(df["V241177"].where(df["V241177"].isin(range(1, 8))))
+            df = df[df["fund_ideo7_z"].notna()].copy()
+        elif outcome == "vote_h9":
+            # H9: trust-in-government composite. Direction: HIGH = MORE cynicism.
+            # V241229 trust govt (1=always,5=never; HIGH=less trust → KEEP)
+            # V241230 trust courts (same; KEEP)
+            # V241233 # corrupt in govt (1=all,5=none; HIGH=less corruption → REVERSE)
+            # V241235 elections matter (1-3; 1=great deal,3=not much; HIGH=less efficacy → KEEP)
+            for v in ["V241229", "V241230", "V241233", "V241235"]:
+                df[v + "_v"] = df[v].where(df[v] > 0)
+            df["tg_govtrust"] = df["V241229_v"]                     # high = less trust
+            df["tg_courttrust"] = df["V241230_v"]                   # high = less trust
+            df["tg_corrupt_rev"] = 6 - df["V241233_v"]              # high = more corrupt perceived
+            df["tg_elec_efficacy"] = df["V241235_v"]                # high = less efficacy
+            comp_cols = ["tg_govtrust", "tg_courttrust", "tg_corrupt_rev", "tg_elec_efficacy"]
+            # require >=3 of 4 non-missing
+            df["_tg_nonmiss"] = df[comp_cols].notna().sum(axis=1)
+            df = df[df["_tg_nonmiss"] >= 3].copy()
+            df["tg_composite"] = df[comp_cols].mean(axis=1, skipna=True)
+            df["fund_trust_gov_z"] = _zscore(df["tg_composite"])
+        elif outcome == "vote_h10":
+            # H10: anti-system composite. Direction: HIGH = MORE anti-system.
+            # V242304 ("insiders") + V242305 ("rich/powerful"); both 1=describes very well,5=not at all.
+            # REVERSE so HIGH = MORE anti-system endorsement.
+            for v in ["V242304", "V242305"]:
+                df[v + "_v"] = df[v].where(df[v].isin([1, 2, 3, 4, 5]))
+            df["as_insiders_rev"] = 6 - df["V242304_v"]
+            df["as_richpwr_rev"] = 6 - df["V242305_v"]
+            df["as_composite"] = df[["as_insiders_rev", "as_richpwr_rev"]].mean(axis=1)
+            df = df[df["as_composite"].notna()].copy()
+            df["fund_antisystem_z"] = _zscore(df["as_composite"])
+        elif outcome == "vote_h11":
+            # H11: Trump_ft × cohort INTERACTION (heterogeneous slope).
+            # Trump_ft_z already constructed; multiply by cohort_num.
+            df["fund_trump_ft_x_cohort"] = df["fund_trump_ft_z"].astype(float) * cohort_num.fillna(3).astype(float)
+        elif outcome == "vote_h12":
+            # H12: party identity importance (V241228). 1=extremely,5=not at all.
+            # REVERSE so HIGH = MORE important.
+            df["V241228_v"] = df["V241228"].where(df["V241228"].isin([1, 2, 3, 4, 5]))
+            df["fund_pid_import_z"] = _zscore(6 - df["V241228_v"])
+            df = df[df["fund_pid_import_z"].notna()].copy()
     elif outcome == "gaza_aid_pal":
         # V241404: PRE FAVOR/OPPOSE U.S. GIVING HUMANITARIAN AID TO PALESTINIANS
         # 1=Favor, 2=Oppose, 3=Neither. z>0 = more opposed/neutral relative to favor.
@@ -215,21 +271,22 @@ def anes_load_and_prep(outcome="vote"):
         df["y"] = _zscore(df["V241245"])
         outcome_kind = "gaussian"
     elif outcome == "racial_resentment":
-        # Pre-reg v2.0 H5 + §10 dev 6: ANES racial resentment 4-item Kinder-Sanders battery (POST).
-        # V242300 WORKWAY  (1-5, HIGHER = MORE resentment)
-        # V242301 GENRTNS  (1-5, HIGHER = LOWER resentment — REVERSE)
-        # V242302 DESERVE  (1-5, HIGHER = LOWER resentment — REVERSE)
-        # V242303 TRYHARDER (1-5, HIGHER = MORE resentment)
-        # Composite = mean of items after reverse-coding so HIGHER = MORE resentment,
-        # then z-score.
+        # Pre-reg v2.0 H5 + §10 dev 6 + §10 dev 7 (post-correction):
+        # ANES racial resentment 4-item Kinder-Sanders battery (POST), canonical direction.
+        # In raw ANES: 1 = "agree strongly", 5 = "disagree strongly".
+        # Items where AGREE = MORE resent: V242300 WORKWAY ("blacks should work way up
+        # without favors") + V242303 TRYHARDER ("if blacks tried harder"). → REVERSE.
+        # Items where AGREE = LESS resent: V242301 GENRTNS ("past slavery makes it
+        # difficult") + V242302 DESERVE ("blacks gotten less than they deserve"). → KEEP.
+        # Composite HIGHER = MORE racial resentment (canonical Kinder-Sanders direction).
         for v in ["V242300", "V242301", "V242302", "V242303"]:
             df[v + "_v"] = df[v].where(df[v].isin([1, 2, 3, 4, 5]))
-        df["rr_workway"] = df["V242300_v"]
-        df["rr_genrtns_rev"] = 6 - df["V242301_v"]
-        df["rr_deserve_rev"] = 6 - df["V242302_v"]
-        df["rr_tryharder"] = df["V242303_v"]
-        df["rr_composite"] = df[["rr_workway", "rr_genrtns_rev",
-                                  "rr_deserve_rev", "rr_tryharder"]].mean(axis=1)
+        df["rr_workway"] = 6 - df["V242300_v"]      # agree=more resent → reverse
+        df["rr_genrtns"] = df["V242301_v"]          # agree=less resent → keep
+        df["rr_deserve"] = df["V242302_v"]          # agree=less resent → keep
+        df["rr_tryharder"] = 6 - df["V242303_v"]    # agree=more resent → reverse
+        df["rr_composite"] = df[["rr_workway", "rr_genrtns",
+                                  "rr_deserve", "rr_tryharder"]].mean(axis=1)
         df = df[df["rr_composite"].notna()].copy()
         df["y"] = _zscore(df["rr_composite"])
         outcome_kind = "gaussian"
@@ -309,20 +366,21 @@ def ces_load_and_prep(outcome="vote"):
         # §10 dev 2: not in CES 2024 Common Content (no healthcare/single-payer item).
         return None
     elif outcome == "structural_inequity":
-        # Pre-reg v2.0 H5 + §10 dev 6: CES racial resentment battery (CC24_441).
-        # Full-sample 2-item Kinder-Sanders core:
+        # Pre-reg v2.0 H5 + §10 dev 6 + §10 dev 7 (post-correction):
+        # CES racial resentment battery (CC24_441 full-sample subset).
+        # In raw CES: 1 = "strongly agree", 5 = "strongly disagree".
         #   CC24_441a WORKWAY ("Irish/Italians overcame...Blacks should do same") n=49430
-        #     1-5, HIGHER = MORE resentment
+        #     agree = MORE resent → REVERSE.
         #   CC24_441b GENRTNS ("Generations of slavery make it difficult") n=49428
-        #     1-5, HIGHER = LOWER resentment — REVERSE
+        #     agree = LESS resent → KEEP.
         # 3 additional items (CC24_441e/f/g) are subsample n=12k and probe different
         # construct (white denial / awareness), excluded from canonical composite.
-        # Composite = mean(workway, 6-genrtns), z-scored; HIGHER = MORE resentment.
+        # Composite HIGHER = MORE racial resentment (canonical Kinder-Sanders direction).
         for c in ["CC24_441a", "CC24_441b"]:
             df[c + "_v"] = df[c].where(df[c].isin([1, 2, 3, 4, 5]))
-        df["rr_workway"] = df["CC24_441a_v"]
-        df["rr_genrtns_rev"] = 6 - df["CC24_441b_v"]
-        df["rr_composite"] = df[["rr_workway", "rr_genrtns_rev"]].mean(axis=1)
+        df["rr_workway"] = 6 - df["CC24_441a_v"]    # agree=more resent → reverse
+        df["rr_genrtns"] = df["CC24_441b_v"]        # agree=less resent → keep
+        df["rr_composite"] = df[["rr_workway", "rr_genrtns"]].mean(axis=1)
         df = df[df["rr_composite"].notna()].copy()
         df["y"] = _zscore(df["rr_composite"])
         outcome_kind = "gaussian"
@@ -527,6 +585,11 @@ if __name__ == "__main__":
         ("ANES gaza_protests",   lambda: anes_load_and_prep("gaza_protests")),
         ("ANES single_payer",    lambda: anes_load_and_prep("single_payer")),
         ("ANES racial_resentment", lambda: anes_load_and_prep("racial_resentment")),
+        ("ANES vote_h8 (ideology)",    lambda: anes_load_and_prep("vote_h8")),
+        ("ANES vote_h9 (trust_gov)",   lambda: anes_load_and_prep("vote_h9")),
+        ("ANES vote_h10 (antisystem)", lambda: anes_load_and_prep("vote_h10")),
+        ("ANES vote_h11 (trump_x_cohort)", lambda: anes_load_and_prep("vote_h11")),
+        ("ANES vote_h12 (pid_import)", lambda: anes_load_and_prep("vote_h12")),
         ("CES vote",             lambda: ces_load_and_prep("vote")),
         ("CES structural_inequity", lambda: ces_load_and_prep("structural_inequity")),
         ("GSS science",          lambda: gss_load_and_prep("science")),
