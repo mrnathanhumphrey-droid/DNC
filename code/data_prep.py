@@ -189,6 +189,63 @@ def anes_load_and_prep(outcome="vote"):
         # Map cohort label to 1-5; compute product with econ_z
         cohort_num = df["cohort"].map({"Silent":1,"Boomer":2,"GenX":3,"Millennial":4,"GenZ":5})
         df["fund_econ_x_cohort"] = df["fund_econ_z"].astype(float) * cohort_num.fillna(3).astype(float)
+    elif outcome in ("vote_h27", "vote_h28", "vote_h29"):
+        # Pre-reg v2.6 H27-H29 (behavioral/structural channel).
+        df = df[df["V242096x"].isin([1, 2]) & (df["V241227x"] > 0)].copy()
+        df["y"] = (df["V242096x"] == 1).astype(int)
+        df["fund_pid7_z"] = _zscore(df["V241227x"].astype(float))
+        df["fund_trump_ft_z"] = _zscore(df["V241157"].where(df["V241157"] >= 0))
+        df["fund_trump_ft_z"] = df["fund_trump_ft_z"].fillna(0.0)
+        df["fund_gaza_salience_z"] = _zscore(df["V241404"].where(df["V241404"] > 0))
+        df["fund_gaza_salience_z"] = df["fund_gaza_salience_z"].fillna(0.0)
+        cohort_num = df["cohort"].map({"Silent":1,"Boomer":2,"GenX":3,"Millennial":4,"GenZ":5})
+        df["fund_econ_x_cohort"] = df["fund_econ_z"].astype(float) * cohort_num.fillna(3).astype(float)
+
+        # H27 mobilization composites
+        party_contact = (df["V242004"] == 1).astype(float)
+        # Set to NaN for negatives (no post, refused, etc.)
+        party_contact = party_contact.where(df["V242004"] > 0, np.nan)
+        fund_party_contact_z = pd.Series(_zscore(party_contact), index=df.index).fillna(0.0)
+
+        activity_count = ((df["V242011"] == 1).astype(int)
+                          + (df["V242012"] == 1).astype(int)
+                          + (df["V242013"] == 1).astype(int))
+        activity_count = activity_count.where(df["V242011"] > -5, np.nan)  # require valid V242011 responding
+        fund_campaign_activity_z = pd.Series(_zscore(activity_count.astype(float)), index=df.index).fillna(0.0)
+
+        # H28 life-stage composites
+        owns_home = (df["V241530"] == 1).astype(float)
+        owns_home = owns_home.where(df["V241530"] > 0, np.nan)
+        fund_owns_home_z = pd.Series(_zscore(owns_home), index=df.index).fillna(0.0)
+
+        ever_married = df["V241461x"].isin([1, 2, 3, 4]).astype(float)
+        ever_married = ever_married.where(df["V241461x"] > 0, np.nan)
+        fund_ever_married_z = pd.Series(_zscore(ever_married), index=df.index).fillna(0.0)
+
+        has_student_debt = (df["V241569"] > 0).astype(float)
+        has_student_debt = has_student_debt.where(df["V241569"] >= 0, np.nan)
+        fund_has_student_debt_z = pd.Series(_zscore(has_student_debt), index=df.index).fillna(0.0)
+
+        # Financial worry: V241539 raw 1=Extremely, 5=Not at all
+        # REVERSE so HIGH = MORE worried
+        fin_worry = (6 - df["V241539"]).where(df["V241539"] > 0, np.nan)
+        fund_financial_worry_z = pd.Series(_zscore(fin_worry), index=df.index).fillna(0.0)
+
+        if outcome == "vote_h27":
+            df["fund_party_contact_z"] = fund_party_contact_z
+            df["fund_campaign_activity_z"] = fund_campaign_activity_z
+        elif outcome == "vote_h28":
+            df["fund_owns_home_z"] = fund_owns_home_z
+            df["fund_ever_married_z"] = fund_ever_married_z
+            df["fund_has_student_debt_z"] = fund_has_student_debt_z
+            df["fund_financial_worry_z"] = fund_financial_worry_z
+        else:  # vote_h29 — combined
+            df["fund_party_contact_z"] = fund_party_contact_z
+            df["fund_campaign_activity_z"] = fund_campaign_activity_z
+            df["fund_owns_home_z"] = fund_owns_home_z
+            df["fund_ever_married_z"] = fund_ever_married_z
+            df["fund_has_student_debt_z"] = fund_has_student_debt_z
+            df["fund_financial_worry_z"] = fund_financial_worry_z
     elif outcome in ("vote_h24", "vote_h25", "vote_h26"):
         # Pre-reg v2.5 H23-H26 (media-diet channel). H4 baseline + media composites.
         df = df[df["V242096x"].isin([1, 2]) & (df["V241227x"] > 0)].copy()
