@@ -337,6 +337,116 @@ def gss_load_and_prep(outcome="science"):
     return data, meta
 
 
+# ---------------- AP VoteCast ----------------
+# Pre-reg v2.0 §3.1 + §10 dev 1: AP age is 6-band (AGE65), not 4 as v1.0 §3.2 assumed.
+# Cleaner cohort mapping using actual AGE65 bands:
+#   Band 1 (18-24): GenZ-band (mostly GenZ, some young Mill bleed at 25-27 absent here)
+#   Band 2 (25-29): MillYoung-band (mixed GenZ 25-27 + Mill 28-29)
+#   Band 3 (30-39): Millennial-band (clean Mill, ages 30-39)
+#   Band 4 (40-49): MillOld-GenX-band (Mill 40-43 + GenX 44-49)
+#   Band 5 (50-64): GenX-Boomer-band (GenX 50-59 + Boomer 60-64)
+#   Band 6 (65+): Boomer-Silent-band
+
+AP_AGE_BAND_LABELS = {
+    1: "18-24",  # GenZ-pure
+    2: "25-29",  # GenZ-Mill mix
+    3: "30-39",  # Millennial-pure
+    4: "40-49",  # Mill-GenX mix
+    5: "50-64",  # GenX-Boomer mix
+    6: "65+",    # Boomer-Silent mix
+}
+
+AP_RACE_MAP = {
+    1: "white", 2: "black", 3: "hispanic", 4: "asian",
+    5: "amind", 6: "nhpi", 7: "other",
+}
+AP_EDUC_MAP = {1: "hs_or_less", 2: "some_col", 3: "ba", 4: "grad"}
+AP_GENDER_MAP = {1: "man", 2: "woman", 3: "nb"}
+
+
+def ap_load_and_prep(outcome="vote"):
+    """AP VoteCast 2024 Model A data prep.
+    Uses AGE65 6-band as cohort proxy (banded approximation per pre-reg v1.0 §12 dev 4 +
+    pre-reg v2.0 §10 dev 1). Uses RACETH 7-level (preserves Asian, accepts disclosure
+    drop of ~54% with race-removed). Fundamentals: BETTERHANDLEECON binary (1=Trump, 0=Harris)
+    as econ-perception proxy. AP does NOT carry 2020 vote recall — marginal effect only.
+    """
+    p = RAW / "ap_votecast_2024" / "AP_VOTECAST_2024_GENERAL.csv"
+    df = pd.read_csv(
+        p,
+        usecols=["RACE0_PARTY","AGE65","RACETH","GENDER","EDUC","P_STATE",
+                 "BETTERHANDLEECON","FINALVOTE_NATIONAL_WEIGHT"],
+        low_memory=False,
+    )
+    n0 = len(df)
+
+    # AP values are coded "(N) Label" strings — extract leading int
+    import re
+    def code(s):
+        if pd.isna(s): return np.nan
+        m = re.match(r"\((\d+)\)", str(s))
+        return int(m.group(1)) if m else np.nan
+    for c in ["RACE0_PARTY","AGE65","RACETH","GENDER","EDUC","BETTERHANDLEECON"]:
+        df[c] = df[c].map(code)
+
+    # Vote: RACE0_PARTY 1=Dem (Harris), 2=Rep (Trump). Drop other.
+    df = df[df["RACE0_PARTY"].isin([1, 2])].copy()
+
+    # Demographics: drop disclosure-removed + refused values
+    df = df[df["AGE65"].isin(range(1, 7))].copy()
+    df = df[df["RACETH"].isin(range(1, 8))].copy()
+    df = df[df["GENDER"].isin([1, 2, 3])].copy()
+    df = df[df["EDUC"].isin([1, 2, 3, 4])].copy()
+
+    df["cohort"] = df["AGE65"].map(AP_AGE_BAND_LABELS)
+    df["race"] = df["RACETH"].map(AP_RACE_MAP)
+    df["educ"] = df["EDUC"].map(AP_EDUC_MAP)
+    df["gender"] = df["GENDER"].map(AP_GENDER_MAP)
+    df["age"] = df["AGE65"]  # carry through for _build_data_dict needed list
+
+    # Region from P_STATE 2-letter postal code
+    STATE_REGION = {
+        "ME":"NE","NH":"NE","VT":"NE","MA":"NE","RI":"NE","CT":"NE","NJ":"NE","NY":"NE","PA":"NE",
+        "OH":"MW","IN":"MW","IL":"MW","MI":"MW","WI":"MW","MN":"MW","IA":"MW","MO":"MW","ND":"MW","SD":"MW","NE":"MW","KS":"MW",
+        "DE":"South","MD":"South","DC":"South","VA":"South","WV":"South","NC":"South","SC":"South","GA":"South","FL":"South",
+        "KY":"South","TN":"South","AL":"South","MS":"South","AR":"South","LA":"South","OK":"South","TX":"South",
+        "MT":"West","ID":"West","WY":"West","CO":"West","NM":"West","AZ":"West","UT":"West","NV":"West",
+        "WA":"West","OR":"West","CA":"West","AK":"West","HI":"West",
+    }
+    def state_code(s):
+        if pd.isna(s): return None
+        m = re.match(r"\(([A-Z]{2})\)", str(s))
+        return m.group(1) if m else None
+    df["state_code"] = df["P_STATE"].map(state_code)
+    df["region"] = df["state_code"].map(STATE_REGION)
+    df = df[df["region"].notna()].copy()
+
+    # Fundamental: BETTERHANDLEECON 1=Trump, 2=Harris, 3=both, 4=neither, 99=refused
+    # Code as: fund_betterecon_trump (1 if 1, else 0); fund_betterecon_harris (1 if 2)
+    # Drop 99; 3 & 4 are baseline (neither / both equally)
+    df["fund_betterecon_trump"] = (df["BETTERHANDLEECON"] == 1).astype(int)
+    df["fund_betterecon_harris"] = (df["BETTERHANDLEECON"] == 2).astype(int)
+
+    outcome_kind = "binary"
+    if outcome == "vote":
+        df["y"] = (df["RACE0_PARTY"] == 1).astype(int)
+    else:
+        return None
+
+    needed = ["age", "cohort", "race", "educ", "gender", "region"]
+    df_clean = df.dropna(subset=needed).copy()
+    data, sub_meta = _build_data_dict(df_clean, "y", outcome_kind,
+                                       weight_col="FINALVOTE_NATIONAL_WEIGHT")
+    meta = {
+        "substrate": "AP", "outcome": outcome, "outcome_kind": outcome_kind,
+        "n0_raw": n0, **sub_meta,
+        "fundamentals_note": "v2 AP: BETTERHANDLEECON one-hot (Trump/Harris vs neither baseline); "
+                             "NO 2020 recall on AP — marginal effect not conditional.",
+        "ap_age_band_labels": AP_AGE_BAND_LABELS,
+    }
+    return data, meta
+
+
 # ---------------- Main ----------------
 
 if __name__ == "__main__":
@@ -351,6 +461,7 @@ if __name__ == "__main__":
         ("CES vote",             lambda: ces_load_and_prep("vote")),
         ("GSS science",          lambda: gss_load_and_prep("science")),
         ("GSS foreign_aid",      lambda: gss_load_and_prep("foreign_aid")),
+        ("AP vote",              lambda: ap_load_and_prep("vote")),
     ]
     for name, fn in jobs:
         print(f"--- {name} ---")
