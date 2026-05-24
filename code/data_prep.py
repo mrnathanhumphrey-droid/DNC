@@ -43,7 +43,7 @@ def birthyr_to_cohort(birthyr):
     else: return "Silent"
 
 
-COHORT_LEVELS = ["Silent", "Boomer", "GenX", "Millennial", "GenZ"]
+COHORT_LEVELS = ["Silent", "Boomer", "GenX", "Millennial", "MillOld", "MillYoung", "GenZ"]
 
 # Census state FIPS → 4-region (Census)
 STATE_FIPS_TO_REGION = {
@@ -172,6 +172,23 @@ def anes_load_and_prep(outcome="vote"):
         df = df[df["V242096x"].isin([1, 2]) & (df["V241227x"] > 0)].copy()
         df["y"] = (df["V242096x"] == 1).astype(int)
         df["fund_pid7_z"] = _zscore(df["V241227x"].astype(float))
+    elif outcome == "vote_h4":
+        # Pre-reg v2.0 H4: ANES vote with extended fundamentals matrix.
+        # pid7 + Trump FT (V241157, 0-100) + Gaza-salience (V241404 z-scored as covariate)
+        # + econ×cohort interaction.
+        df = df[df["V242096x"].isin([1, 2]) & (df["V241227x"] > 0)].copy()
+        df["y"] = (df["V242096x"] == 1).astype(int)
+        df["fund_pid7_z"] = _zscore(df["V241227x"].astype(float))
+        # Trump feeling thermometer (0-100); drop -9 -8 -1
+        df["fund_trump_ft_z"] = _zscore(df["V241157"].where(df["V241157"] >= 0))
+        df["fund_trump_ft_z"] = df["fund_trump_ft_z"].fillna(0.0)
+        # Gaza-salience: V241404 (humanitarian aid to Palestinians) as ordinal covariate
+        df["fund_gaza_salience_z"] = _zscore(df["V241404"].where(df["V241404"] > 0))
+        df["fund_gaza_salience_z"] = df["fund_gaza_salience_z"].fillna(0.0)
+        # Econ × cohort interaction (cohort_idx 1-5 numeric)
+        # Map cohort label to 1-5; compute product with econ_z
+        cohort_num = df["cohort"].map({"Silent":1,"Boomer":2,"GenX":3,"Millennial":4,"GenZ":5})
+        df["fund_econ_x_cohort"] = df["fund_econ_z"].astype(float) * cohort_num.fillna(3).astype(float)
     elif outcome == "gaza_aid_pal":
         # V241404: PRE FAVOR/OPPOSE U.S. GIVING HUMANITARIAN AID TO PALESTINIANS
         # 1=Favor, 2=Oppose, 3=Neither. z>0 = more opposed/neutral relative to favor.
@@ -223,6 +240,17 @@ def ces_load_and_prep(outcome="vote"):
     df = pd.read_csv(p, low_memory=False)
     n0 = len(df)
 
+    def birthyr_to_cohort6(by):
+        """6-level cohort with Millennial split (pre-reg v2.0 §3.4 H6)."""
+        if pd.isna(by) or by < 1900 or by > 2010:
+            return np.nan
+        if by >= 1997: return "GenZ"
+        if by >= 1989: return "MillYoung"  # 28-35 in 2024
+        if by >= 1981: return "MillOld"    # 36-43 in 2024
+        if by >= 1965: return "GenX"
+        if by >= 1946: return "Boomer"
+        return "Silent"
+    df["cohort6"] = df["birthyr"].apply(birthyr_to_cohort6)
     df["cohort"] = df["birthyr"].apply(birthyr_to_cohort)
     df["age"] = 2024 - df["birthyr"]
     race_map = {1: "white", 2: "black", 3: "hispanic", 4: "asian",
@@ -252,6 +280,12 @@ def ces_load_and_prep(outcome="vote"):
     if outcome == "vote":
         df = df[df["CC24_410"].isin([1, 2])].copy()
         df["y"] = (df["CC24_410"] == 1).astype(int)  # 1 = Harris
+    elif outcome == "vote_h6":
+        # Pre-reg v2.0 H6: vote with 6-cohort Millennial split.
+        # Uses cohort6 instead of cohort. Otherwise identical to vote.
+        df = df[df["CC24_410"].isin([1, 2])].copy()
+        df["y"] = (df["CC24_410"] == 1).astype(int)
+        df["cohort"] = df["cohort6"]  # swap into 'cohort' so _build_data_dict picks it up
     elif outcome == "single_payer":
         # CES single-payer item; find in v3
         return None
