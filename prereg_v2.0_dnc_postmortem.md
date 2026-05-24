@@ -258,8 +258,19 @@ Across 7 v2 hypotheses tested:
 
 | Date | Deviation | Rationale |
 |---|---|---|
+| 2026-05-24 | **§10 dev 1: AP cohort banding 4-band → 6-band.** Pre-reg §3.1 locked a 4-band remap (GenZ 18-29, Mill 30-44, GenX 45-64, Boomer 65+); actual AP VoteCast `AGE65` variable is 6-band (18-24, 25-29, 30-39, 40-49, 50-64, 65+). | AP codebook resolution is finer than expected — banding decision must reflect actual variable. 6-band is data-driven (no collapsing arbitrary cells) and strictly more informative; reading the H1.2/H2.2/H3.2 verdicts against the finer bands is conservative (rejects more nulls). |
 
-(Empty at lock; populated as v2 work surfaces discrepancies.)
+### §10 dev 1 — 6-band → H1.2 / H2.2 / H3.2 verdict mapping rule (LOCKED before reading results)
+
+Pre-reg H1.2/H2.2/H3.2 falsification gates reference "Millennial-band", "GenZ-band", "Boomer-band". Against the 6-band AP fit, the mapping is:
+
+- **GenZ-band** ≡ AP band 1 (18-24). Band 2 (25-29) overlaps Mill-Young; not used for GenZ-band verdicts.
+- **Millennial-band** ≡ AP band 3 (30-39) ∪ band 4 (40-49). Verdict reads CONFIRMED if EITHER band's cell 95% CI lies on the pre-reg-prescribed side; PARTIAL if one credible + one indeterminate; REFUTED if either credibly OPPOSITE.
+- **Boomer-band / 65+ band** ≡ AP band 6 (65+).
+
+Rationale: pre-reg 30-44 Millennial band straddles AP's 30-39 + 40-49 split. Reading EITHER band's credible-cell as a CONFIRMATION matches the original 30-44 directional intent. Requiring BOTH would be stricter than pre-reg specified.
+
+This mapping rule was committed in this deviation BEFORE the verdict was read against the 6-band fit. Deviation log entry hash will be the lock.
 
 ---
 
