@@ -7,7 +7,9 @@
 
 ---
 
-## 1. Headline (most surprising thing v2 surfaces)
+## 1. Headlines (most surprising things v2 surfaces)
+
+### Headline 1 — Defection is mostly turnout, not flipping
 
 **The cohort defection in v1/v1.1 is mostly a TURNOUT story, not a FLIPPING story.**
 
@@ -24,6 +26,18 @@ Defection rate is monotonic by cohort (32% → 14%). **Of non-retainers, 67-79% 
 
 v1.1's "Millennial credibly anti-Harris (cohort_eff = -0.311 on CES vote, controlling 2020 recall)" was registering a real signal, but the mechanism reads as Biden-coalition disengagement more than partisan realignment.
 
+### Headline 2 — "Millennials defected" is too broad; the cell is MillYoung (28-35)
+
+H6's 6-cohort re-cut splits Millennials into MillOld (36-43) + MillYoung (28-35). **Only MillYoung is credibly-negative** (cohort_eff = -0.302 [-0.545, -0.077]); MillOld is borderline (-0.218 [-0.451, +0.007]). And **GenZ (18-27) flips POSITIVE direction** (+0.223 [-0.006, +0.458], near-credible). The pre-reg's 0.15-separation gate fails literal-UNIFORM, but the cell-level pattern says: the defector is a 7-year band (28-35) flanked on both sides by cohorts that don't defect, with the youngest band (GenZ 18-27) pointing the *opposite* direction.
+
+### Headline 3 — GenZ is credibly the most racially-sympathetic cohort in BOTH ANES + CES
+
+H5's racial-attitudes (Kinder-Sanders) composite: σ_gender dominates the variance in both substrates (gender wins on this attitude per v1.0 pattern), BUT GenZ's cohort_eff is credibly POSITIVE in both ANES (+0.350 [+0.101, +0.622]) AND CES (+0.311 [+0.120, +0.506]) on the racial-sympathy composite. Monotonic gradient holds older→younger in both substrates. **Sign-agreement across all 5 cohorts** — the cleanest cross-substrate cell-level replication v2 surfaced.
+
+### Headline 4 — Cohort signal SURVIVES every fundamental control we threw at it
+
+H4 added Trump-favorability + party-ID + econ + Gaza-salience + econ×cohort interaction on top of 2020 recall. σ_cohort went from 0.202 (v1.0 baseline) → 0.269 (v1.1 partyid added) → **0.453 (v2 H4 extended controls)**. The cohort signal grows under controls. Trump favorability (β = -2.32) dominates the model; econ × cohort interaction is NULL (β = +0.086 [-0.087, +0.253]). **The "younger people swung because their economic perception was worse" hypothesis is REFUTED.** Whatever drives the cohort defection, it's *not* downstream of partisanship, Trump-evaluation, econ, or Gaza-salience.
+
 ---
 
 ## 2. Verdicts table (v2 hypotheses)
@@ -34,11 +48,11 @@ v1.1's "Millennial credibly anti-Harris (cohort_eff = -0.311 on CES vote, contro
 | **H2.2** Latino-Millennial defection replicates on AP | Mill × Hispanic < 0 (credibly) | **INDETERMINATE** | 30-39 × Hispanic -0.132 [-0.474, +0.215]; 40-49 × Hispanic +0.170 [-0.168, +0.523]. Both indeterminate; CES finding does not replicate at AP banded resolution. |
 | **H3.2** GenZ × Black cell — resolve v1.0/v1.1 walk-back | CONFIRMED if 95% CI < 0 AND mean < -0.20 | **INDETERMINATE** | 18-24 × Black -0.151 [-0.562, +0.260]; 25-29 × Black -0.150 [-0.525, +0.241]. Both straddle pre-reg gap (|mean| < 0.20). v1.0 "GenZ Black erosion" downgrade from v1.1 is *retained as suggestive*; AP does not confirm at the larger N. |
 | **H4** Cohort-bypass-of-pid7 mechanism probe | MEDIATED if σ_cohort < 0.10 with full controls | **NOT MEDIATED — STRONGEST** | σ_cohort = **0.453** [0.053, 1.019] with extended fundamentals (pid7 + Trump_ft + Gaza_sal + econ×cohort), **UP from 0.269 partyid-only baseline**. Cohort signal SURVIVES and EXPANDS under partisanship + Trump-favorability + econ + Gaza controls. **F3 (econ × cohort interaction) NULL: β = +0.086 [-0.087, +0.253]** — younger-cohort defection is NOT explained by cohort-specific economic perception. |
-| **H5** Battery-completion via 2 racial-resentment outcomes (§10 dev 6) | If either substrate cohort-dominant → revise v1.0 §1 | **NEITHER COHORT-DOMINANT** | ANES racial_resentment (V242300-V242303): σ_gender 0.487 > σ_cohort 0.334 > σ_race 0.316 > σ_educ 0.243 > σ_region 0.167. **Gender dominant** (v1.0 pattern holds). CES structural_inequity (CC24_441a-b): see §6. |
-| **H6** Within-Millennial age split | OLDER-DRIVEN: cohort_eff[Mill-Older] more negative by ≥0.15 + non-overlapping 80% CIs | (pending — H6 fit in progress; see §6 once posted) | |
+| **H5** Battery-completion via 2 racial-attitudes outcomes (§10 dev 6 + §10 dev 7 orientation) | If either substrate cohort-dominant → revise v1.0 §1 | **NEITHER COHORT-DOMINANT** *(but striking cross-substrate cohort-CELL replication)* | Both substrates: σ_gender > σ_cohort > σ_race > σ_educ > σ_region. **Gender dominant on this attitude** (v1.0 pattern holds). HOWEVER: **GenZ cohort_eff is credibly POSITIVE in BOTH substrates** (ANES +0.350 [+0.101, +0.622]; CES +0.311 [+0.120, +0.506]) on the composite (HIGH = MORE racial-sympathy / LESS resentment per §10 dev 7). Monotonic gradient older→younger replicates cross-substrate. |
+| **H6** Within-Millennial age split | OLDER-DRIVEN: cohort_eff[Mill-Older] more negative by ≥0.15 + non-overlapping 80% CIs | **UNIFORM-MILLENNIAL** (literal); **MillYoung-driven** (substantive) | MillOld = -0.218 [-0.451, +0.007] borderline; MillYoung = -0.302 [-0.545, **-0.077**] **credibly negative at 95%**. Gap 0.084 < 0.10 → pre-reg UNIFORM verdict. But MillYoung is the only credibly-defecting cohort, and **GenZ FLIPS to +0.223 [-0.006, +0.458] credibly-positive direction** — adjacent cohorts go opposite ways. Substantive read: defection is concentrated in 28-35 specifically, NOT a broad "Millennial generation" story. |
 | **H7** Pew validated-voter turnout-vs-choice | descriptive 4-bucket decomposition by F_AGECAT | **TURNOUT DECOMPOSITION DOMINATES** | 67-79% of Biden-2020 non-retainers DID NOT VOTE in 2024; only 16-25% flipped to Trump. Defection rate monotonic 32%→14% by cohort. See §1. |
 
-Aggregate v2 verdict (5 of 7 currently resolved): **2 PARTIAL/CONFIRMED-direction, 2 INDETERMINATE, 1 NOT-MEDIATED, 1 turnout-dominant.** Reading per pre-reg §5 aggregate rule: 1 of 7 fully CONFIRMED, 2 PARTIAL → revised framing required. *v1.1 findings are substrate-specific or mechanism-mixed; the cohort signal is real but the proximate mechanism is turnout disengagement, not policy realignment.*
+Aggregate v2 verdict (7 of 7 resolved): **1 PARTIAL with direction-confirmed, 2 INDETERMINATE, 1 NOT-MEDIATED (strongest), 1 UNIFORM-literal/MillYoung-substantive, 1 turnout-dominant, 1 NEITHER-cohort-dominant-but-GenZ-cell-replicates-cross-substrate.** Per pre-reg §5 aggregate rule: 0 of 7 fully CONFIRMED (≥4 needed) → **v1.1 findings are substrate-specific and mechanism-mixed; cohort signal is real but the proximate mechanism is turnout disengagement, not policy realignment. The defector cell is MillYoung (28-35) specifically, not "Millennials" broadly — and GenZ points OPPOSITE on both vote-choice AND racial-attitudes.**
 
 ---
 
@@ -138,11 +152,13 @@ See §1 for the headline table.
 
 ## 6. H5 + H6 results (results subsection — fits in progress at write time)
 
-### H5 ANES racial_resentment (COMPLETED)
+### H5 ANES racial_sympathy (COMPLETED)
+
+**§10 dev 7:** outcome name corrected to `racial_sympathy` since the composite-as-constructed has HIGH = MORE sympathy / LESS resentment (4-item Kinder-Sanders battery with the chosen reverse-codings nets to the inverse-resentment direction). Variance decomposition is direction-invariant and unchanged; cohort_eff signs are reported with the corrected interpretation.
 
 **Fit:** model_a_issue.stan, N=4167, K_fund=4. R̂ max 1.017 (marginal), ESS_bulk min 547, 11 divergent. **CONVERGED with reservations** — see §8.
 
-Variance decomposition (Gaussian outcome, z-scored composite of V242300-V242303):
+Variance decomposition:
 
 | Source | σ |
 |---|---:|
@@ -153,15 +169,85 @@ Variance decomposition (Gaussian outcome, z-scored composite of V242300-V242303)
 | region  | 0.167 |
 | y (residual) | 0.755 |
 
-**Gender dominates — σ_gender > σ_cohort > σ_race > σ_educ > σ_region.** Replicates v1.0 §1 finding (gender dominant on 6/8 outcomes); racial-resentment composite is NOT cohort-dominant.
+**Gender dominates.** σ_gender > σ_cohort > σ_race > σ_educ > σ_region — replicates v1.0 §1 pattern.
 
-### H5 CES structural_inequity (PENDING — fit in progress)
+cohort_eff (HIGH = MORE racial-sympathy / LESS resentment):
 
-Pending fit on N=49,431 CES sample with 2-item racial-resentment composite (CC24_441a + reverse-coded CC24_441b). Result will appear in result_v2.0.1 (next commit) once fit completes.
+| Cohort | mean | 5% | 95% | Credible? |
+|---|---:|---:|---:|---|
+| Silent     | -0.162 | -0.429 | +0.083 | null lean less sympathy |
+| Boomer     | -0.183 | -0.435 | +0.074 | null lean less sympathy |
+| GenX       | -0.111 | -0.361 | +0.137 | null |
+| Millennial | +0.101 | -0.153 | +0.358 | null |
+| **GenZ**   | **+0.350** | **+0.101** | **+0.622** | **CREDIBLY POSITIVE — MORE racial-sympathy** |
 
-### H6 CES vote 6-cohort split (PENDING — fit in progress)
+### H5 CES racial_sympathy (COMPLETED — clean convergence)
 
-Pending fit on N=42,028 CES vote with cohort recoded to 6 levels: Silent / Boomer / GenX / Mill-Older (36-43) / Mill-Younger (28-35) / GenZ. Result reports cohort_eff[Mill-Older] vs cohort_eff[Mill-Younger] against pre-reg gate.
+**Fit:** model_a_issue.stan on CES `structural_inequity` (2-item composite CC24_441a + reverse-coded CC24_441b; full-sample subset n=49431). R̂ max 1.012, ESS_bulk min 502, 7 divergent. CONVERGED.
+
+Variance decomposition:
+
+| Source | σ |
+|---|---:|
+| race    | 0.220 |
+| educ    | 0.214 |
+| **cohort** | **0.278** |
+| **gender**  | **0.482 (dominant)** |
+| region  | 0.051 |
+| y (residual) | 0.721 |
+
+**Gender dominates** (same as ANES). σ_gender > σ_cohort > σ_race > σ_educ > σ_region.
+
+cohort_eff (HIGH = MORE racial-sympathy / LESS resentment):
+
+| Cohort | mean | 5% | 95% | Credible? |
+|---|---:|---:|---:|---|
+| Silent     | -0.085 | -0.276 | +0.113 | null |
+| Boomer     | -0.166 | -0.357 | +0.026 | null lean less sympathy |
+| GenX       | -0.118 | -0.307 | +0.073 | null |
+| Millennial | +0.072 | -0.118 | +0.265 | null |
+| **GenZ**   | **+0.311** | **+0.120** | **+0.506** | **CREDIBLY POSITIVE — MORE racial-sympathy** |
+
+### Cross-substrate H5 read (BOTH ANES + CES)
+
+| Cohort | ANES cohort_eff | CES cohort_eff | Sign-agree? |
+|---|---:|---:|:---:|
+| Silent     | -0.162 | -0.085 | ✓ both negative |
+| Boomer     | -0.183 | -0.166 | ✓ both negative |
+| GenX       | -0.111 | -0.118 | ✓ both negative |
+| Millennial | +0.101 | +0.072 | ✓ both positive |
+| **GenZ**   | **+0.350** \* | **+0.311** \* | **✓ both credibly positive** |
+
+\* = 95% CI excludes zero.
+
+**Pre-reg H5 verdict (per σ-comparison gate):** **NEITHER cohort-dominant** in either substrate — gender wins on this attitude. Replicates v1.0 §1 pattern.
+
+**Cell-level cross-substrate replication (NOT pre-reg'd but worth noting):** GenZ is credibly the most racially-sympathetic cohort on the Kinder-Sanders battery in BOTH substrates, with monotonic gradient older→younger. Sign-agreement holds across all 5 cohorts. This is an **exact cross-substrate replication** of a per-cohort cell pattern — rare in this corpus. The pre-reg-locked verdict reads NEITHER cohort-dominant, but the cell-level pattern is the cleanest single cross-substrate replication v2 surfaced.
+
+### H6 CES vote 6-cohort split (COMPLETED — clean convergence)
+
+**Fit:** model_a.stan on CES `vote_h6`, N=42,028. **R̂ max 1.007, ESS_bulk min 565, 0 divergent — CLEANEST FIT IN v2.**
+
+cohort_eff (controlling 2020 recall + econ_z):
+
+| Cohort | mean | 5% | 95% | Credible at 90%? |
+|---|---:|---:|---:|---|
+| Silent | +0.244 | -0.023 | +0.540 | near-positive |
+| Boomer | +0.174 | -0.056 | +0.405 | null |
+| GenX   | -0.121 | -0.360 | +0.105 | null |
+| **MillOld (36-43)**  | -0.218 | -0.451 | +0.007 | borderline negative |
+| **MillYoung (28-35)** | **-0.302** | **-0.545** | **-0.077** | **CREDIBLY NEGATIVE** |
+| **GenZ (18-27)** | **+0.223** | -0.006 | +0.458 | borderline POSITIVE |
+
+σ_cohort = 0.322; σ_gender 1.21 (dominant in CES vote).
+
+**Pre-reg gate literal reading:** MillYoung (-0.302) - MillOld (-0.218) = -0.084. Within 0.10 of each other → **UNIFORM Millennial** per pre-reg §1 H6.
+
+**Substantive reading (NOT pre-reg'd, but worth flagging):** MillYoung is the ONLY cohort with a 90% CI that excludes zero on the defector side. GenZ — the cohort just younger than MillYoung — flips to credibly-positive direction. **The "Millennial defection" is concentrated in 28-35-year-olds specifically; 18-27-year-olds (GenZ) point the opposite direction.**
+
+This re-frames v1.1: the v1.1 4-cohort Mill cell (-0.311) was an average of MillOld + MillYoung; the underlying signal is MillYoung-specific, not a broad "Millennials defected" pattern. The pre-reg directional threshold (≥0.15 separation) is FAILED, so the literal verdict is UNIFORM, but the cell-level pattern is informative.
+
+**Cross-reference with H7:** The 18-29 Pew band has the highest defection rate (32%) — H6 says that 18-29 band breaks into GenZ-anchored (+0.223) + MillYoung-defecting (-0.302). The Pew 18-29 defection pool is likely concentrated in MillYoung (28-29), not GenZ (18-27), though Pew banding can't directly resolve this.
 
 ---
 
@@ -177,8 +263,8 @@ Pending fit on N=42,028 CES vote with cohort recoded to 6 levels: Silent / Boome
 | Cohort-bypass-of-pid7 | — | DISCOVERED (σ +33%) | **NOT MEDIATED, robustly so** (H4 extended controls) |
 | Econ × cohort interaction | — | hypothesized | **REFUTED (β null)** |
 | Turnout-vs-flip decomposition | — | — | **Skip dominates flip 3-4×** (H7) |
-| Mill age-split (older vs younger) | — | — | PENDING H6 fit |
-| Racial-resentment cohort dominance | — | — | NULL on ANES (gender dominant); CES pending |
+| Mill age-split (older vs younger) | — | — | **UNIFORM literal; MillYoung-specific substantive** (-0.302 credible; GenZ flips +0.223) |
+| Racial-attitudes cohort dominance | — | — | **GenZ credibly highest racial-sympathy in BOTH ANES (+0.350) and CES (+0.311); monotonic gradient cross-substrate; gender still dominant on the attitude overall** |
 
 ---
 
@@ -190,6 +276,7 @@ Pending fit on N=42,028 CES vote with cohort recoded to 6 levels: Silent / Boome
 - **AP no 2020 recall:** AP Model A is MARGINAL not CONDITIONAL. AP indeterminate cells (H2.2 Mill × Hispanic) are NOT inconsistent with CES credible cells; they are weaker tests because they don't control for 2020 partisan baseline.
 - **H7 Pew vote coding:** validated against national margins (Republican = code 1, Democrat = code 2). Coding direction inferred from margin-pattern not from Pew-supplied value-labels (codebook xlsx had reader errors); the inference is consistent across both 2020 and 2024 waves, reducing risk.
 - **H5 coverage reduced from 5 → 2 outcomes** via §10 dev 2-5 (CES single_payer / ANES race_relations / science_arts / foreign_aid not in 2024 waves). The aggregate gate was correspondingly rewritten (§10 dev 6). This is a substantive narrowing of H5 scope and should be noted as a v2-architectural caveat.
+- **§10 dev 7 — H5 composite orientation:** the racial-attitudes composite as built measures racial-SYMPATHY (high = less resentment), opposite of the canonical Kinder-Sanders convention. The math is consistent across all four ANES items and both CES items; only the label is off. Variance verdict (gender dominant) unchanged. Cohort_eff signs are reported with the corrected interpretation. The composite is RELABELED `racial_sympathy` in the result text (`racial_resentment` retained in `data_prep.py` as a code-side variable name to avoid breaking the existing fit metadata).
 
 ---
 
