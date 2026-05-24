@@ -189,6 +189,52 @@ def anes_load_and_prep(outcome="vote"):
         # Map cohort label to 1-5; compute product with econ_z
         cohort_num = df["cohort"].map({"Silent":1,"Boomer":2,"GenX":3,"Millennial":4,"GenZ":5})
         df["fund_econ_x_cohort"] = df["fund_econ_z"].astype(float) * cohort_num.fillna(3).astype(float)
+    elif outcome in ("vote_h24", "vote_h25", "vote_h26"):
+        # Pre-reg v2.5 H23-H26 (media-diet channel). H4 baseline + media composites.
+        df = df[df["V242096x"].isin([1, 2]) & (df["V241227x"] > 0)].copy()
+        df["y"] = (df["V242096x"] == 1).astype(int)
+        df["fund_pid7_z"] = _zscore(df["V241227x"].astype(float))
+        df["fund_trump_ft_z"] = _zscore(df["V241157"].where(df["V241157"] >= 0))
+        df["fund_trump_ft_z"] = df["fund_trump_ft_z"].fillna(0.0)
+        df["fund_gaza_salience_z"] = _zscore(df["V241404"].where(df["V241404"] > 0))
+        df["fund_gaza_salience_z"] = df["fund_gaza_salience_z"].fillna(0.0)
+        cohort_num = df["cohort"].map({"Silent":1,"Boomer":2,"GenX":3,"Millennial":4,"GenZ":5})
+        df["fund_econ_x_cohort"] = df["fund_econ_z"].astype(float) * cohort_num.fillna(3).astype(float)
+
+        # V241602 ideology scores LOCKED in prereg_v2.5 §2.1
+        SHOW_IDEOLOGY = {
+            "V241602a": 0.3,  "V241602b": 0.2,  "V241602c": 0.0,  "V241602d": 0.0,
+            "V241602e": 0.0,  "V241602f": 0.0,  "V241602g": 0.0,  "V241602h": 0.0,
+            "V241602i": 0.0,  "V241602j": 0.0,  "V241602k": -0.8, "V241602m": 0.8,
+            "V241602n": 0.9,  "V241602p": 0.8,  "V241602q": 0.2,  "V241602r": 0.4,
+        }
+        # PRICE IS RIGHT (V241602h) excluded from ideology composite (game show, score=0)
+        IDEOLOGY_ITEMS = [k for k in SHOW_IDEOLOGY if k != "V241602h"]
+        VOLUME_ITEMS = list(SHOW_IDEOLOGY.keys())
+
+        # Per-respondent: count of mentions + ideology-weighted sum
+        df["media_volume"] = 0
+        df["_ideology_sum"] = 0.0
+        df["_ideology_count"] = 0
+        for v in VOLUME_ITEMS:
+            mentioned = (df[v] == 1).astype(int)
+            df["media_volume"] = df["media_volume"] + mentioned
+            if v in SHOW_IDEOLOGY and v != "V241602h":
+                df["_ideology_sum"] = df["_ideology_sum"] + mentioned * SHOW_IDEOLOGY[v]
+                df["_ideology_count"] = df["_ideology_count"] + mentioned
+        df["media_ideology_mean"] = np.where(df["_ideology_count"] > 0,
+                                              df["_ideology_sum"] / df["_ideology_count"], 0.0)
+        media_score_z = pd.Series(_zscore(df["media_ideology_mean"]), index=df.index).fillna(0.0)
+        media_vol_z = pd.Series(_zscore(df["media_volume"].astype(float)), index=df.index).fillna(0.0)
+        media_score_x_cohort = (media_score_z * cohort_num.fillna(3).astype(float)).fillna(0.0)
+        if outcome == "vote_h24":
+            df["fund_media_diet_score_z"] = media_score_z
+        elif outcome == "vote_h25":
+            df["fund_media_volume_z"] = media_vol_z
+        else:  # vote_h26
+            df["fund_media_diet_score_z"] = media_score_z
+            df["fund_media_volume_z"] = media_vol_z
+            df["fund_media_score_x_cohort"] = media_score_x_cohort
     elif outcome in ("vote_h8", "vote_h9", "vote_h10", "vote_h11", "vote_h12"):
         # Pre-reg v2.1 H8-H12 (mediator hunt): same base as vote_h4 + 1 mediator
         # for the specific hypothesis. K_fund_new = 9.
@@ -362,6 +408,12 @@ def ces_load_and_prep(outcome="vote"):
         df = df[df["CC24_410"].isin([1, 2])].copy()
         df["y"] = (df["CC24_410"] == 1).astype(int)
         df["cohort"] = df["cohort6"]  # swap into 'cohort' so _build_data_dict picks it up
+    elif outcome == "vote_h6_x_race":
+        # Pre-reg v2.4: 6-cohort × race interaction model.
+        # Identical sample to vote_h6 but uses model_a_interaction.stan downstream.
+        df = df[df["CC24_410"].isin([1, 2])].copy()
+        df["y"] = (df["CC24_410"] == 1).astype(int)
+        df["cohort"] = df["cohort6"]
     elif outcome == "single_payer":
         # §10 dev 2: not in CES 2024 Common Content (no healthcare/single-payer item).
         return None
