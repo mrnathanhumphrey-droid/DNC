@@ -214,8 +214,27 @@ def anes_load_and_prep(outcome="vote"):
         df = df[df["V241245"].isin(range(1, 8))].copy()  # keep 1..7, drop 99 + DK/RF/Inap
         df["y"] = _zscore(df["V241245"])
         outcome_kind = "gaussian"
+    elif outcome == "racial_resentment":
+        # Pre-reg v2.0 H5 + §10 dev 6: ANES racial resentment 4-item Kinder-Sanders battery (POST).
+        # V242300 WORKWAY  (1-5, HIGHER = MORE resentment)
+        # V242301 GENRTNS  (1-5, HIGHER = LOWER resentment — REVERSE)
+        # V242302 DESERVE  (1-5, HIGHER = LOWER resentment — REVERSE)
+        # V242303 TRYHARDER (1-5, HIGHER = MORE resentment)
+        # Composite = mean of items after reverse-coding so HIGHER = MORE resentment,
+        # then z-score.
+        for v in ["V242300", "V242301", "V242302", "V242303"]:
+            df[v + "_v"] = df[v].where(df[v].isin([1, 2, 3, 4, 5]))
+        df["rr_workway"] = df["V242300_v"]
+        df["rr_genrtns_rev"] = 6 - df["V242301_v"]
+        df["rr_deserve_rev"] = 6 - df["V242302_v"]
+        df["rr_tryharder"] = df["V242303_v"]
+        df["rr_composite"] = df[["rr_workway", "rr_genrtns_rev",
+                                  "rr_deserve_rev", "rr_tryharder"]].mean(axis=1)
+        df = df[df["rr_composite"].notna()].copy()
+        df["y"] = _zscore(df["rr_composite"])
+        outcome_kind = "gaussian"
     elif outcome == "race_relations":
-        # Need correct V-code; placeholder
+        # §10 dev 3: not in ANES 2024 wave. See prereg_v2.0 §10.
         return None
     else:
         return None
@@ -287,11 +306,26 @@ def ces_load_and_prep(outcome="vote"):
         df["y"] = (df["CC24_410"] == 1).astype(int)
         df["cohort"] = df["cohort6"]  # swap into 'cohort' so _build_data_dict picks it up
     elif outcome == "single_payer":
-        # CES single-payer item; find in v3
+        # §10 dev 2: not in CES 2024 Common Content (no healthcare/single-payer item).
         return None
     elif outcome == "structural_inequity":
-        # CES racial resentment battery; find in v3
-        return None
+        # Pre-reg v2.0 H5 + §10 dev 6: CES racial resentment battery (CC24_441).
+        # Full-sample 2-item Kinder-Sanders core:
+        #   CC24_441a WORKWAY ("Irish/Italians overcame...Blacks should do same") n=49430
+        #     1-5, HIGHER = MORE resentment
+        #   CC24_441b GENRTNS ("Generations of slavery make it difficult") n=49428
+        #     1-5, HIGHER = LOWER resentment — REVERSE
+        # 3 additional items (CC24_441e/f/g) are subsample n=12k and probe different
+        # construct (white denial / awareness), excluded from canonical composite.
+        # Composite = mean(workway, 6-genrtns), z-scored; HIGHER = MORE resentment.
+        for c in ["CC24_441a", "CC24_441b"]:
+            df[c + "_v"] = df[c].where(df[c].isin([1, 2, 3, 4, 5]))
+        df["rr_workway"] = df["CC24_441a_v"]
+        df["rr_genrtns_rev"] = 6 - df["CC24_441b_v"]
+        df["rr_composite"] = df[["rr_workway", "rr_genrtns_rev"]].mean(axis=1)
+        df = df[df["rr_composite"].notna()].copy()
+        df["y"] = _zscore(df["rr_composite"])
+        outcome_kind = "gaussian"
     else:
         return None
 
@@ -492,7 +526,9 @@ if __name__ == "__main__":
         ("ANES israel_military", lambda: anes_load_and_prep("israel_military")),
         ("ANES gaza_protests",   lambda: anes_load_and_prep("gaza_protests")),
         ("ANES single_payer",    lambda: anes_load_and_prep("single_payer")),
+        ("ANES racial_resentment", lambda: anes_load_and_prep("racial_resentment")),
         ("CES vote",             lambda: ces_load_and_prep("vote")),
+        ("CES structural_inequity", lambda: ces_load_and_prep("structural_inequity")),
         ("GSS science",          lambda: gss_load_and_prep("science")),
         ("GSS foreign_aid",      lambda: gss_load_and_prep("foreign_aid")),
         ("AP vote",              lambda: ap_load_and_prep("vote")),
