@@ -124,15 +124,17 @@ print(f"  saved {OUT / '02_cohort_gradient.png'}")
 print("Chart 3: Forest plot of 5 v2.9 channels")
 # β [5%, 95%] per v2.9 result
 channels = [
+    ("Leftist composite → Harris-mob\n(non-voter universe; v2.11)", 0.619, 0.459, 0.783, "STRONG"),
+    ("Leftist composite → Trump-mob\n(non-voter universe; v2.11)", -0.468, -0.583, -0.356, "STRONG"),
     ("Economic perception\n(worse → skip)", 0.446, 0.398, 0.495, "STRONG"),
     ("Trust collapse (combined)\n(less trust → skip)", 0.370, 0.321, 0.419, "STRONG"),
     ("Pro-choice (less → skip)\n[abortion composite]", -0.257, -0.297, -0.217, "STRONG"),
     ("Mobilization gap\n(less contact → skip)", -0.251, -0.299, -0.204, "STRONG"),
     ("Pro-climate (less → skip)\n[climate composite]", -0.243, -0.289, -0.198, "STRONG"),
     ("Trust elections\n(less confidence → skip)", 0.222, 0.177, 0.266, "STRONG"),
+    ("Leftist composite (less → skip)\n[Biden universe; v2.11]", -0.215, -0.258, -0.170, "STRONG"),
     ("Pro-immigration (less → skip)\n[immigration composite]", -0.205, -0.245, -0.163, "STRONG"),
     ("Engagement gradient\n(less engaged → skip)", -0.150, -0.240, -0.061, "WEAK"),
-    ("Leftist composite (v2.11)\n(less leftist → skip)", -0.215, -0.258, -0.170, "STRONG"),
 ]
 # Sort by absolute β
 channels = sorted(channels, key=lambda x: abs(x[1]), reverse=True)
@@ -149,7 +151,7 @@ for i, (name, b, q5, q95, verdict) in enumerate(channels):
 ax.axvline(0, color="#444", linewidth=1, alpha=0.6)
 ax.set_yticks(y_pos)
 ax.set_yticklabels([c[0] for c in channels], fontsize=10)
-ax.set_xlim(-0.4, 0.7)
+ax.set_xlim(-0.65, 0.85)
 ax.set_xlabel("Standardized β coefficient (Bayesian hierarchical logistic)")
 ax.set_title("Channels predicting Biden-2020 → 2024 skip\n(Positive β = predicts skipping; Negative β = predicts retention)", pad=12)
 

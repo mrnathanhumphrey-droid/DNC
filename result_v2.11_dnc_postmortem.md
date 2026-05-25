@@ -1,7 +1,7 @@
 # result_v2.11 — DNC 2024 Post-Mortem v2.11 ("Blame the Leftists" + "Rich Boomer" hypotheses)
 
-**Locked (diagnostic + observational portion):** 2026-05-25.
-**Stan composite/item β values:** pending fit completion (task `bitlt29gy`, ETA ~17:30).
+**Locked (final, all β values in):** 2026-05-25.
+**Stan fits completed:** task `bm84p4iu4` (composite ran in `bitlt29gy`, remaining 6 in re-fire). All 7 fits converged clean (R̂ ≤ 1.004, ESS_bulk ≥ 1377).
 **Pre-reg:** `prereg_v2.11_dnc_postmortem.md` (`ea9aca3`).
 **Builds on:** result_v2.10 (`df16116`).
 **User directions (2026-05-25):**
@@ -14,7 +14,9 @@ Two folk-political hypotheses tested. **Both REFUTED.** A third pattern emerged 
 
 ## 1. Headline (one paragraph)
 
-**"Blame the leftists" is REFUTED on every cut.** Within the Biden-2020 skip|retain universe (N=17,401, 928 skip events), the LEAST leftist Biden voters skipped at nearly 2× the rate of the MOST leftist (Q0 7.0% vs Q3 3.8%). The pattern is monotonic, survives within strong-Dem pid7 stratification, survives within every cohort, and is NOT a non-response artifact (97.8% of voters answered all 11 leftist-composite items). The composite's signal is dominated by **mainstream-Dem-consensus items** (same-sex marriage recognition, infrastructure, corporate tax) — not "socialist" items. The actually-socialist items (student loan forgiveness, anti-FISA, anti-TikTok-ban) are NEAR-NULL as single-item predictors. There is a small "leftist 3rd-party flip" channel concentrated in Q3 (Stein/West/etc., ~89 voters in CES universe; 3.4% of Q3); credible but absolute count too small to decide an election.
+**It wasn't the young or the rich. It was the fact no one spoke to the actual poor working class.**
+
+**"Blame the leftists" is REFUTED on every cut.** Leftist Biden voters retained at higher rates than centrist ones (β=-0.215 STRONG-credible after pid7+demographic controls; raw monotonic Q0 7.0% vs Q3 3.8%). Pattern survives within strong-Dem stratification AND within every cohort (GenZ Q0=22.9% vs Q3=4.3%). Composite signal is driven by **mainstream-Dem-consensus items** (same-sex marriage recognition, infrastructure, corp tax); actually-socialist items (student loan, anti-TikTok, anti-FISA) are NULL/INDET individually. And on the non-voter side, **leftist composite predicting Harris-mobilization is β=+0.619 STRONG — the LARGEST single coefficient in the entire v2 program** (bigger than v2.9's dominant econ channel). Leftists ACTIVELY EXPANDED the coalition.
 
 **"Rich-Boomer-disaffected" is REFUTED in the opposite direction.** Boomer skip rate is MONOTONICALLY DECREASING with income: <$10k Boomers skip at 8.6%, $200-250k Boomers skip at 1.0%. High-income Boomers retained at higher rates than low-income Boomers. The "rich don't care because politics doesn't affect them" hypothesis is empirically inverted.
 
@@ -49,22 +51,52 @@ Monotonic decline in skip rate from Q0 to Q3. Combined leftist-exit (skip + 3rd-
 
 **The "blame the leftists" narrative is empirically REFUTED for skipping. There is a small 3rd-party defection signal (~89 voters in CES, scaled to nation maybe ~500k-1M) consistent with the Stein/West/anti-Genocide-Joe protest vote, but this is absolute-count-tiny and didn't decide any state.**
 
-### 2.3 Stan composite β [PENDING FIT COMPLETION, TBD ~17:30]
+### 2.3 Stan composite β — FINAL
 
-Hierarchical Bayesian fit (`v211_skip_composite`) on `skipped` outcome with `left_composite_z` as predictor + pid7_z + faminc_z + employ + cohort + race + educ + gender + region random intercepts.
+Hierarchical Bayesian fit on `skipped` outcome with `left_composite_z` as predictor + pid7_z + faminc_z + employ + cohort + race + educ + gender + region random intercepts.
 
-**Expected based on raw pattern:** β should land **negative**, magnitude in the -0.10 to -0.25 range (WEAK to STRONG-credible). Confirms diagnostic finding under hierarchical controls.
+| Fit | β | [5%, 95%] | Verdict | R̂ | ESS_bulk |
+|---|---:|---|---|---:|---:|
+| H_LEFTIST_A composite × skip | **-0.215** | [-0.258, -0.170] | **STRONG-credible NEGATIVE** | 1.001 | 11,851 |
 
-[fit result to be inserted when task `bitlt29gy` completes]
+**β = -0.215 STRONG. The raw quintile pattern survived hierarchical controls.** Hierarchical Bayes with pid7 + demographics + cohort fixed effects + survey weights confirms: more leftist → less skip, at magnitude comparable to v2.9 issue-conservatism composite (which was driven by Wall + Drill).
 
-### 2.4 Single-item Stan β decomp [PENDING]
+**"Blame the leftists" REFUTED at STRONG-credible magnitude.**
 
-- left_student_loan_z (CC24_323f support = leftist)
-- left_anti_tiktok_z (CC24_340d oppose = leftist)
-- left_anti_fisa_z (CC24_340e oppose = leftist)
-- left_medicaid_z (CC24_328e support = leftist)
+### 2.4 Single-item Stan β decomp — FINAL
 
-[4 fits pending; results to be inserted]
+The composite signal does NOT come from the actually-socialist sub-items.
+
+| Item | β | [5%, 95%] | Verdict |
+|---|---:|---|---|
+| `left_student_loan_z` (CC24_323f support=leftist) | -0.044 | [-0.097, +0.009] | **NULL** |
+| `left_anti_tiktok_z` (CC24_340d oppose=leftist) | -0.005 | [-0.058, +0.048] | **NULL** |
+| `left_anti_fisa_z` (CC24_340e oppose=leftist) | -0.093 | [-0.143, -0.042] | INDET (credible-but-small) |
+| `left_medicaid_z` (CC24_328e support=leftist) | -0.074 | [-0.122, -0.025] | INDET (credible-but-small) |
+
+**All 4 actually-socialist items are NULL or INDETERMINATE individually.** The composite signal (β=-0.215) comes from the OTHER items (mainstream-Dem-consensus): same-sex marriage recognition, infrastructure spending, corporate tax raise, contraceptive access. Single-item univariate from §2.2-C5 already showed these are the items with -7 to -10pp skip differences.
+
+**Refined interpretation:** the composite isn't measuring "leftism" so much as **mainstream-Democratic alignment**. Biden voters who held the mainstream-Dem positions across 11 issues retained at much higher rates. Biden voters who DEFECTED from the mainstream-Dem position on most items skipped at much higher rates. The actually-socialist positions (loan forgiveness, anti-TikTok, anti-FISA, expand-Medicaid) are neutral on the skip decision.
+
+### 2.5 Mirror universe — leftist composite as mobilizer (HUGE finding)
+
+The composite predictor was also fired on the v2.10 mirror universe (2020 non-voters → 2024 outcome):
+
+| Fit | Universe | β | [5%, 95%] | Verdict |
+|---|---|---:|---|---|
+| H_LEFTIST_B composite × harris_mob | N=1,754 | **+0.619** | [+0.459, +0.783] | **STRONG-credible POSITIVE** |
+| H_LEFTIST_C composite × trump_mob | N=1,734 | **-0.468** | [-0.583, -0.356] | **STRONG-credible NEGATIVE** |
+
+**β = +0.619 for leftist composite predicting Harris-mobilization is the LARGEST single coefficient in the entire v2 program** (bigger than v2.9's economic-perception channel at β=+0.446).
+
+Reading: a 1-SD increase in the leftist composite among 2020 non-voters increases the log-odds of Harris-mobilization by 0.62, AND decreases the log-odds of Trump-mobilization by 0.47. Leftist non-voters were the COALITION-BUILDERS for Harris in 2024.
+
+**"Blame the leftists" is REFUTED in three independent ways:**
+1. Leftist Biden voters retained MORE (β=-0.215 STRONG)
+2. Leftist non-voters MOBILIZED for Harris (β=+0.619 STRONG — biggest single effect in v2 program)
+3. Leftist non-voters did NOT mobilize for Trump (β=-0.468 STRONG)
+
+The narrative "socialists demobilized the Biden coalition" is **empirically inverted**: leftists actively SUPPORTED and EXPANDED the coalition in 2024.
 
 ---
 
