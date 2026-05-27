@@ -120,10 +120,17 @@ def main():
         if len(sub) > 0:
             print(f"    {c}: N={len(sub)}, mean_composite_raw={sub['left_composite_raw'].mean():.3f}, mean_z={sub['left_composite_z'].mean():+.3f}")
 
-    # H_LEFTIST_A: composite × skip
+    # H_LEFTIST_A: composite x skip  (SKIP if already completed — fit 1 ran on previous attempt)
+    import os
+    already_done = os.path.exists(OUT_DIR / "fit_v211_skip_composite_summary.csv")
     fund_cols = BASE_FUND + ["left_composite_z"]
-    data, _ = make_stan_data(bd, fund_cols, "skipped")
-    fit, summary, diag = fit_one("v211_skip_composite", data, model_stan="model_a.stan")
+    if already_done:
+        print("\n  [SKIP] v211_skip_composite already completed; loading existing summary")
+        summary = pd.read_csv(OUT_DIR / "fit_v211_skip_composite_summary.csv", index_col=0)
+        diag = {"max_rhat": float(summary["R_hat"].max()), "min_ess_bulk": float(summary["ESS_bulk"].min()), "N": 17401}
+    else:
+        data, _ = make_stan_data(bd, fund_cols, "skipped")
+        fit, summary, diag = fit_one("v211_skip_composite", data, model_stan="model_a.stan")
     # Adjust output path
     (Path("D:/DNC/data/processed/v210") / "fit_v211_skip_composite_summary.csv").rename(
         OUT_DIR / "fit_v211_skip_composite_summary.csv") if (Path("D:/DNC/data/processed/v210") / "fit_v211_skip_composite_summary.csv").exists() else None
@@ -132,7 +139,7 @@ def main():
     r = coef_row(summary, f"beta_fund[{beta_idx}]")
     if r:
         mean, q5, q95, credible = r
-        print(f"\n  ** H_LEFTIST_A composite β={mean:+.3f} [{q5:+.3f}, {q95:+.3f}] cred={credible} **")
+        print(f"\n  ** H_LEFTIST_A composite beta={mean:+.3f} [{q5:+.3f}, {q95:+.3f}] cred={credible} **")
         all_results.append({"hypothesis": "H_LEFTIST_A", "universe": "biden_skip",
                            "predictor": "left_composite_z", "mean": mean, "q5": q5, "q95": q95,
                            "credible": credible, "max_rhat": diag["max_rhat"],
@@ -150,7 +157,7 @@ def main():
             mean, q5, q95, credible = r
             mag = abs(mean)
             verdict = "NULL" if not credible or mag < 0.05 else ("INDET" if mag < 0.10 else ("WEAK" if mag < 0.20 else "STRONG"))
-            print(f"  [{predictor}] β={mean:+.3f} [{q5:+.3f}, {q95:+.3f}] {verdict}")
+            print(f"  [{predictor}] beta={mean:+.3f} [{q5:+.3f}, {q95:+.3f}] {verdict}")
             all_results.append({"hypothesis": "H_LEFTIST_DECOMP", "universe": "biden_skip",
                                "predictor": predictor, "mean": mean, "q5": q5, "q95": q95,
                                "credible": credible, "verdict": verdict,
@@ -180,7 +187,7 @@ def main():
     r = coef_row(summary, f"beta_fund[{beta_idx}]")
     if r:
         mean, q5, q95, credible = r
-        print(f"\n  ** H_LEFTIST_B composite × harris_mob β={mean:+.3f} [{q5:+.3f}, {q95:+.3f}] cred={credible} **")
+        print(f"\n  ** H_LEFTIST_B composite x harris_mob beta={mean:+.3f} [{q5:+.3f}, {q95:+.3f}] cred={credible} **")
         all_results.append({"hypothesis": "H_LEFTIST_B", "universe": "harris_mob",
                            "predictor": "left_composite_z", "mean": mean, "q5": q5, "q95": q95,
                            "credible": credible, "max_rhat": diag["max_rhat"],
@@ -196,7 +203,7 @@ def main():
     r = coef_row(summary, f"beta_fund[{beta_idx}]")
     if r:
         mean, q5, q95, credible = r
-        print(f"\n  ** H_LEFTIST_C composite × trump_mob β={mean:+.3f} [{q5:+.3f}, {q95:+.3f}] cred={credible} **")
+        print(f"\n  ** H_LEFTIST_C composite x trump_mob beta={mean:+.3f} [{q5:+.3f}, {q95:+.3f}] cred={credible} **")
         all_results.append({"hypothesis": "H_LEFTIST_C", "universe": "trump_mob",
                            "predictor": "left_composite_z", "mean": mean, "q5": q5, "q95": q95,
                            "credible": credible, "max_rhat": diag["max_rhat"],
