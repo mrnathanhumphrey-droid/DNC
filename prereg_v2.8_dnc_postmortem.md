@@ -4,7 +4,7 @@
 - result_v2.6 (HEAD `887c384`): 12 mediators ruled out; remaining channels include "right-wing media exposure" (data-blocked in ANES public release).
 - pre-reg v2.7 (HEAD `bb21e1a`): ANES-survey-side alt-right-PROXY composite.
 
-**Motivation.** Per user direction 2026-05-24: "*can we find any alt right signals? with rumble or the rise of that groyper fuck? id love to see all 3. but i want data on the alt right and how to measure it. i think SM followers for the groypers or ashley sinclair is an option. media mentions of 'alt right' or 'groyper' or 'rumble' or some other terms??*" PLUS: user has X API access in DeepDive env (`TWITTER_BEARER_TOKEN`, $0.01/user-lookup).
+**Motivation.** Per user direction 2026-05-24: "*can we find any alt right signals? with rumble or the rise of the groyper movement? id love to see all 3. but i want data on the alt right and how to measure it. i think SM followers for the groypers or ashley sinclair is an option. media mentions of 'alt right' or 'groyper' or 'rumble' or some other terms??*" PLUS: user has X API access in DeepDive env (`TWITTER_BEARER_TOKEN`, $0.01/user-lookup).
 
 v2.7 measures the SURVEY-SIDE alt-right-aligned voter cluster. v2.8 measures the EXTERNAL alt-right exposure ecosystem via:
 1. Google Trends search-interest time-series (state-level)

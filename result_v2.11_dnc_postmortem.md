@@ -6,7 +6,7 @@
 **Builds on:** result_v2.10 (`df16116`).
 **User directions (2026-05-25):**
 - *"did the socialists get people to stop voting?"*
-- *"IT WAS THE FUCKING BOOMERS WASNT IT!? rich boomers who don't give af cause politics doesnt affect them"*
+- *"It was the boomers, wasn't it? Rich boomers who don't care, because politics doesn't affect them."*
 
 Two folk-political hypotheses tested. **Both REFUTED.** A third pattern emerged from the diagnostics that is more accurate.
 
